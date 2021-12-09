@@ -6,11 +6,18 @@
 /*   By: aaapatou <aaapatou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/26 16:24:32 by aaapatou          #+#    #+#             */
-/*   Updated: 2021/11/26 23:14:40 by aaapatou         ###   ########.fr       */
+/*   Updated: 2021/12/08 03:29:10 by aaapatou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
+
+int	ft_isnum(int nb)
+{
+	if (nb >= '0' && nb <= '9')
+		return (1);
+	return (0);
+}
 
 void	ft_read_argument(int ac, char **av, long long *tab)
 {

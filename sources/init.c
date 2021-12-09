@@ -6,7 +6,7 @@
 /*   By: aaapatou <aaapatou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/26 15:38:30 by aaapatou          #+#    #+#             */
-/*   Updated: 2021/12/01 16:08:47 by aaapatou         ###   ########.fr       */
+/*   Updated: 2021/12/08 04:12:18 by aaapatou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,10 @@ void	init_data(t_data *data)
 	data->eat_time = 0;
 	data->philo_nbr = 0;
 	data->sleep_time = 0;
+	data->dead = 0;
+	data->satiate_nbr = 0;
+	data->satiate = 0;
+	data->philo = NULL;
 }
 
 void	init_philo(t_philo *philo)
