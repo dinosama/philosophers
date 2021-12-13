@@ -6,7 +6,7 @@
 /*   By: aaapatou <aaapatou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/23 11:10:32 by aaapatou          #+#    #+#             */
-/*   Updated: 2021/12/08 04:30:59 by aaapatou         ###   ########.fr       */
+/*   Updated: 2021/12/13 16:36:41 by aaapatou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@ int	dispatche_forks(int philo_nbr, t_philo *philo)
 	{
 		philo[i].rfork = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * 1);
 		if (pthread_mutex_init(philo[i].rfork, NULL) != 0)
-    	{
-        	printf("mutex init failed\n");
-        	return (0);
-    	}
+		{
+			printf("mutex init failed\n");
+			return (0);
+		}
 		i++;
 	}
 	i--;
@@ -41,8 +41,7 @@ int	dispatche_forks(int philo_nbr, t_philo *philo)
 
 t_philo	*set_philo(t_data *data, t_philo *philo)
 {
-	int		i;
-	unsigned long time;
+	int				i;
 
 	i = 0;
 	philo = malloc(sizeof(t_philo) * data->philo_nbr);
@@ -50,24 +49,11 @@ t_philo	*set_philo(t_data *data, t_philo *philo)
 		return (NULL);
 	philo[i].m_display = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * 1);
 	if (pthread_mutex_init(philo[i].m_display, NULL) != 0)
-    {
-    	ft_putstr("mutex init failed\n");
-    	return (0);
-	}
-	time = ft_get_time();
-	while (i < data->philo_nbr)
 	{
-		philo[i].data = data;
-		philo[i].number = i + 1;
-		philo[i].die_time = data->die_time;
-		philo[i].eat_nbr = data->eat_nbr;
-		philo[i].eat_time = data->eat_time;
-		philo[i].sleep_time = data->sleep_time;
-		philo[i].last_meal = time;
-		if (i > 0)
-			philo[i].m_display = philo[i - 1].m_display;
-		i++;
+		ft_putstr("mutex init failed\n");
+		return (0);
 	}
+	data_philo(i, data, philo);
 	if (!dispatche_forks(data->philo_nbr, philo))
 		return (NULL);
 	return (philo);
@@ -76,7 +62,7 @@ t_philo	*set_philo(t_data *data, t_philo *philo)
 int	death_monitoring(t_philo *philo)
 {
 	unsigned long	time;
-	static int	philo_number;
+	static int		philo_number;
 
 	time = ft_get_time();
 	if (time - philo[philo_number].last_meal >= (unsigned long)philo->die_time)
@@ -104,17 +90,20 @@ void	launch_threads(t_data *data)
 	i = 0;
 	while (i < data->philo_nbr)
 	{
-		pthread_create(&data->philo[i].thread, NULL, &routine, (void *)&data->philo[i]);
+		pthread_create(&data->philo[i].thread, NULL, &routine,
+			(void *)&data->philo[i]);
 		pthread_detach(data->philo[i].thread);
-		usleep(100);
+		usleep(1000);
 		i = i + 2;
 	}
+	usleep(1000);
 	i = 1;
 	while (i < data->philo_nbr)
 	{
-		pthread_create(&data->philo[i].thread, NULL, &routine, (void *)&data->philo[i]);
+		pthread_create(&data->philo[i].thread, NULL, &routine,
+			(void *)&data->philo[i]);
 		pthread_detach(data->philo[i].thread);
-		usleep(100);
+		usleep(1000);
 		i = i + 2;
 	}
 	while (!death_monitoring(data->philo))
@@ -123,8 +112,8 @@ void	launch_threads(t_data *data)
 
 int	main(int ac, char **av)
 {
-	t_data data;
-	t_philo *philo;
+	t_data		data;
+	t_philo		*philo;
 
 	philo = NULL;
 	if (ac != 5 && ac != 6)

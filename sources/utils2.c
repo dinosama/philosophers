@@ -6,7 +6,7 @@
 /*   By: aaapatou <aaapatou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/08 03:28:11 by aaapatou          #+#    #+#             */
-/*   Updated: 2021/12/08 03:28:25 by aaapatou         ###   ########.fr       */
+/*   Updated: 2021/12/13 16:37:03 by aaapatou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,4 +38,24 @@ long long	ft_longatoi(const char *str)
 		i++;
 	}
 	return (stock);
+}
+
+void	data_philo(int i, t_data *data, t_philo *philo)
+{
+	unsigned long	time;
+
+	time = ft_get_time();
+	while (i < data->philo_nbr)
+	{
+		philo[i].data = data;
+		philo[i].number = i + 1;
+		philo[i].die_time = data->die_time;
+		philo[i].eat_nbr = data->eat_nbr;
+		philo[i].eat_time = data->eat_time;
+		philo[i].sleep_time = data->sleep_time;
+		philo[i].last_meal = time;
+		if (i > 0)
+			philo[i].m_display = philo[i - 1].m_display;
+		i++;
+	}
 }
