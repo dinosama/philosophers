@@ -6,7 +6,7 @@
 /*   By: aaapatou <aaapatou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/26 16:24:32 by aaapatou          #+#    #+#             */
-/*   Updated: 2021/12/08 03:29:10 by aaapatou         ###   ########.fr       */
+/*   Updated: 2021/12/28 01:19:10 by aaapatou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,7 @@ int	parse_data(int ac, char **av, t_data *data)
 	if (!ft_checkvalues(ac, tab))
 	{
 		ft_putstr("no int value\n");
+		free(tab);
 		return (-1);
 	}
 	data->philo_nbr = tab[0];
@@ -111,5 +112,8 @@ int	parse_data(int ac, char **av, t_data *data)
 	data->sleep_time = tab[3];
 	if (tab[4] != -1)
 		data->eat_nbr = tab[4];
+	free(tab);
+	if (data->philo_nbr < 1 || data->eat_nbr == 0)
+		return (-1);
 	return (1);
 }

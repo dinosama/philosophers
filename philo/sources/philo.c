@@ -6,7 +6,7 @@
 /*   By: aaapatou <aaapatou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/23 11:10:32 by aaapatou          #+#    #+#             */
-/*   Updated: 2021/12/13 16:36:41 by aaapatou         ###   ########.fr       */
+/*   Updated: 2021/12/29 03:19:17 by aaapatou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,35 +25,32 @@ int	dispatche_forks(int philo_nbr, t_philo *philo)
 			printf("mutex init failed\n");
 			return (0);
 		}
+		philo[i].fork = 0;
 		i++;
-	}
-	i--;
-	while (i >= 0)
-	{
-		if (i == philo_nbr - 1)
-			philo[i].lfork = philo[0].rfork;
-		else
-			philo[i].lfork = philo[i + 1].rfork;
-		i--;
 	}
 	return (1);
 }
 
 t_philo	*set_philo(t_data *data, t_philo *philo)
 {
-	int				i;
+	int	error;
 
-	i = 0;
+	error = 0;
 	philo = malloc(sizeof(t_philo) * data->philo_nbr);
-	if (!philo)
-		return (NULL);
-	philo[i].m_display = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * 1);
-	if (pthread_mutex_init(philo[i].m_display, NULL) != 0)
-	{
-		ft_putstr("mutex init failed\n");
-		return (0);
-	}
-	data_philo(i, data, philo);
+	philo[0].m_display = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * 1);
+	philo[0].m_data = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * 1);
+	philo[0].m_time = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * 1);
+	philo[0].m_death = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * 1);
+	if (!philo[0].m_display || !philo[0].m_data || !philo[0].m_time
+		|| !philo[0].m_death || !philo)
+		ft_error_malloc(philo);
+	error += pthread_mutex_init(philo[0].m_display, NULL);
+	error += pthread_mutex_init(philo[0].m_data, NULL);
+	error += pthread_mutex_init(philo[0].m_time, NULL);
+	error += pthread_mutex_init(philo[0].m_death, NULL);
+	if (error != 0)
+		return (ft_puterror("Error: mutex init failed\n"));
+	data_philo(0, data, philo);
 	if (!dispatche_forks(data->philo_nbr, philo))
 		return (NULL);
 	return (philo);
@@ -65,18 +62,18 @@ int	death_monitoring(t_philo *philo)
 	static int		philo_number;
 
 	time = ft_get_time();
+	pthread_mutex_lock(philo[philo_number].m_time);
 	if (time - philo[philo_number].last_meal >= (unsigned long)philo->die_time)
 	{
+		pthread_mutex_unlock(philo[philo_number].m_time);
 		display_death(&philo[philo_number]);
-		philo[philo_number].data->dead = 1;
 		return (1);
 	}
-	if (philo->data->satiate_nbr == philo->data->philo_nbr)
-	{
-		display_satiate(&philo[philo_number]);
-		philo[philo_number].data->satiate = 1;
+	pthread_mutex_unlock(philo[philo_number].m_time);
+	pthread_mutex_lock(philo[philo_number].m_data);
+	if (check_satiate(philo, philo_number))
 		return (1);
-	}
+	pthread_mutex_unlock(philo[philo_number].m_data);
 	philo_number++;
 	if (philo_number >= philo->data->philo_nbr)
 		philo_number = 0;
@@ -88,22 +85,20 @@ void	launch_threads(t_data *data)
 	int		i;
 
 	i = 0;
+	data->start = ft_get_time();
 	while (i < data->philo_nbr)
 	{
 		pthread_create(&data->philo[i].thread, NULL, &routine,
 			(void *)&data->philo[i]);
-		pthread_detach(data->philo[i].thread);
-		usleep(1000);
+		usleep(50);
 		i = i + 2;
 	}
-	usleep(1000);
 	i = 1;
 	while (i < data->philo_nbr)
 	{
 		pthread_create(&data->philo[i].thread, NULL, &routine,
 			(void *)&data->philo[i]);
-		pthread_detach(data->philo[i].thread);
-		usleep(1000);
+		usleep(50);
 		i = i + 2;
 	}
 	while (!death_monitoring(data->philo))
@@ -133,7 +128,6 @@ int	main(int ac, char **av)
 	if (!data.philo)
 		return (0);
 	launch_threads(&data);
-	usleep(10000);
 	ft_clean(&data);
 	return (0);
 }
